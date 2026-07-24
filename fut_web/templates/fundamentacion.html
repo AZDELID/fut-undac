@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Fundamentación — {{ tramite.nombre }}{% endblock %}
+{% block content %}
+<div class="top-badges">
+  <span class="pill">✓ Datos personales</span>
+  <span class="pill" style="background:var(--azul); color:#fff; border-color:var(--azul);">2. Fundamentación</span>
+  <span class="pill">3. Vista previa</span>
+  <span class="pill">4. Resultado</span>
+</div>
+<h1 class="page-title">Fundamentación del pedido</h1>
+<p class="page-sub">Puedes usar la redacción sugerida tal cual, editarla, o escribir la tuya propia.</p>
+
+<div class="card">
+  <div class="divider">Sugerencia generada automáticamente</div>
+  <div class="suggested-box">{{ sugerida }}</div>
+  {% if faltantes %}
+  <div class="alert alert-orange">Faltan datos para completar la sugerencia: {{ faltantes|join(', ') }}. Complétalos abajo o vuelve al paso anterior.</div>
+  {% endif %}
+
+  <form method="post">
+    <div class="divider">Tu fundamentación</div>
+    {% if error %}<div class="alert alert-red">{{ error }}</div>{% endif %}
+    <textarea name="fundamentacion" rows="10">{{ valor }}</textarea>
+    <div class="field-help">Este texto se usará tal cual en el documento final.</div>
+
+    <div class="actions between">
+      <a href="{{ url_for('datos_personales', clave=clave) }}" class="btn btn-secondary">← Atrás</a>
+      <button type="submit" class="btn btn-primary btn-lg">Continuar →</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

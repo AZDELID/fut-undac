@@ -1,0 +1,123 @@
+[
+  {
+    "clave": "nombres_apellidos",
+    "etiqueta": "Apellidos y Nombres",
+    "obligatorio": true,
+    "placeholder": "ESPINOZA BENAVIDES LUIS PABLO",
+    "validador": null,
+    "ayuda": "Primero apellidos, luego nombres tal como figuran en tu DNI",
+    "alias": [
+      "nombre",
+      "nombres",
+      "apellidos_y_nombres",
+      "nombres_y_apellidos"
+    ]
+  },
+  {
+    "clave": "dni",
+    "etiqueta": "D.N.I.",
+    "obligatorio": true,
+    "placeholder": "71447115",
+    "validador": "dni",
+    "ayuda": "8 dígitos numéricos",
+    "alias": []
+  },
+  {
+    "clave": "codigo",
+    "etiqueta": "Código de Matrícula",
+    "obligatorio": true,
+    "placeholder": "2304403050",
+    "validador": "codigo",
+    "ayuda": "Código numérico de 6 a 12 dígitos",
+    "alias": [
+      "cod",
+      "codigo_matricula",
+      "codigo_de_matricula"
+    ]
+  },
+  {
+    "clave": "celular",
+    "etiqueta": "N° Celular",
+    "obligatorio": true,
+    "placeholder": "987654321",
+    "validador": "celular",
+    "ayuda": "9 dígitos, debe comenzar con 9",
+    "alias": [
+      "tel",
+      "telefono",
+      "celular_telf"
+    ]
+  },
+  {
+    "clave": "correo",
+    "etiqueta": "Correo Electrónico",
+    "obligatorio": true,
+    "placeholder": "pablo@undac.edu.pe",
+    "validador": "correo",
+    "ayuda": "Usa tu correo institucional @undac.edu.pe",
+    "alias": [
+      "email",
+      "correo_electronico"
+    ]
+  },
+  {
+    "clave": "facultad",
+    "etiqueta": "Facultad",
+    "obligatorio": true,
+    "placeholder": "Ingeniería de Sistemas y Computación",
+    "validador": null,
+    "ayuda": "",
+    "alias": []
+  },
+  {
+    "clave": "escuela",
+    "etiqueta": "Escuela Profesional",
+    "obligatorio": true,
+    "placeholder": "Ingeniería de Sistemas",
+    "validador": null,
+    "ayuda": "",
+    "alias": []
+  },
+  {
+    "clave": "especialidad",
+    "etiqueta": "Especialidad",
+    "obligatorio": false,
+    "placeholder": "Sistemas de Información",
+    "validador": null,
+    "ayuda": "Opcional — deja en blanco si no aplica",
+    "alias": []
+  },
+  {
+    "clave": "domicilio",
+    "etiqueta": "Domicilio",
+    "obligatorio": true,
+    "placeholder": "Jr. 28 de Julio, Cerro de Pasco, Pasco",
+    "validador": null,
+    "ayuda": "Calle, Distrito, Provincia y Región",
+    "alias": []
+  },
+  {
+    "clave": "cargo_centro_trabajo",
+    "etiqueta": "Cargo / Centro de Trabajo",
+    "obligatorio": false,
+    "placeholder": "Estudiante",
+    "validador": null,
+    "ayuda": "Opcional — solo si trabajas actualmente",
+    "alias": [
+      "cargo",
+      "centro_trabajo"
+    ]
+  },
+  {
+    "clave": "fundamentacion",
+    "etiqueta": "Fundamentación del Pedido",
+    "obligatorio": true,
+    "placeholder": "",
+    "validador": null,
+    "ayuda": "",
+    "alias": [
+      "fundamentacion_del_pedido",
+      "fundamento"
+    ]
+  }
+]

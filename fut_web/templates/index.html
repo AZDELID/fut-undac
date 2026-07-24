@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Inicio — FUT-UNDAC{% endblock %}
+{% block content %}
+<h1 class="page-title">¿Qué trámite necesitas hoy?</h1>
+<p class="page-sub">Selecciona el tipo de documento que deseas generar</p>
+
+<div class="search-box">
+  <form method="get" action="{{ url_for('index') }}">
+    <span>🔍</span>
+    <input type="text" name="q" value="{{ q }}" placeholder="Busca tu trámite por nombre...">
+    <button class="btn btn-secondary" type="submit">Buscar</button>
+  </form>
+  <div class="hint">Escribe una palabra clave (ej. "matrícula", "traslado") o revisa la lista completa abajo.</div>
+</div>
+
+<div class="stat-row">
+  <div class="stat-card"><div class="n">{{ total }}</div><div class="l">Trámites disponibles</div></div>
+  <div class="stat-card"><div class="n">🔒</div><div class="l">Tus datos se procesan solo en esta sesión</div></div>
+  <div class="stat-card"><div class="n">⚡</div><div class="l">Generación instantánea</div></div>
+  <div class="stat-card"><div class="n">📄</div><div class="l">Word + PDF</div></div>
+</div>
+
+<div class="section-title">⭐ Trámites {% if q %}encontrados{% else %}disponibles{% endif %}</div>
+
+{% if tramites %}
+<div class="grid">
+  {% for t in tramites %}
+  <a class="card-tramite" href="{{ url_for('datos_personales', clave=t.clave) }}">
+    <div class="top">
+      <div class="icon">{{ t.icono }}</div>
+      {% if t.frecuente %}<span class="badge">★ Frecuente</span>{% endif %}
+    </div>
+    <h3>{{ t.nombre }}</h3>
+    <div class="arrow">Iniciar trámite →</div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="page-sub">No se encontraron trámites para "{{ q }}".</p>
+{% endif %}
+{% endblock %}

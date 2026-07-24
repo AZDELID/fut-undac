@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Datos — {{ tramite.nombre }}{% endblock %}
+{% block content %}
+<div class="top-badges">
+  <span class="pill">1. Datos personales</span>
+  <span class="pill">2. Fundamentación</span>
+  <span class="pill">3. Vista previa</span>
+  <span class="pill">4. Resultado</span>
+</div>
+<h1 class="page-title">{{ tramite.nombre }}</h1>
+<p class="page-sub">Completa tus datos para generar el FUT.</p>
+
+<div class="card api-box">
+  <strong>🔍 Autocompletar con la API de UNDAC</strong>
+  <p class="field-help" style="margin-top:6px;">Ingresa tu código de matrícula y el sistema completa tu nombre, DNI, facultad y domicilio automáticamente.</p>
+  <div class="row">
+    <input type="text" id="api-codigo" placeholder="Código de matrícula" value="{{ datos.get('codigo','') }}">
+    <button type="button" class="btn btn-primary" onclick="consultarAPI()">Consultar API</button>
+  </div>
+  <div id="api-status"></div>
+</div>
+
+<form method="post" class="card" id="form-datos">
+  <div class="divider">Datos Personales</div>
+  <div class="cols">
+    {% for clave, etiqueta, obligatorio, ejemplo, validador, ayuda in campos %}
+    <div class="field {% if clave in ancho_completo %}field-full{% endif %}">
+      <label class="field-label" for="f_{{ clave }}">{{ etiqueta }}{% if obligatorio %}<span class="req">*</span>{% endif %}</label>
+      <input type="text" id="f_{{ clave }}" name="{{ clave }}"
+             class="{% if errores.get(clave) %}error{% endif %}"
+             placeholder="{{ ejemplo or '' }}"
+             value="{{ datos.get(clave, perfil.get(clave, '')) }}">
+      {% if errores.get(clave) %}<div class="field-error">{{ errores[clave] }}</div>
+      {% elif ayuda %}<div class="field-help">{{ ayuda }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if tramite.campos_extra %}
+  <div class="divider">Datos del trámite — {{ tramite.nombre }}</div>
+  <div class="cols">
+    {% set opcionales = tramite.get('campos_extra_opcionales', []) %}
+    {% for campo in tramite.campos_extra %}
+    <div class="field">
+      <label class="field-label" for="f_{{ campo }}">{{ campo.replace('_',' ')|capitalize }}{% if campo not in opcionales %}<span class="req">*</span>{% endif %}</label>
+      <input type="text" id="f_{{ campo }}" name="{{ campo }}"
+             class="{% if errores.get(campo) %}error{% endif %}"
+             value="{{ datos.get(campo, '') }}">
+      {% if errores.get(campo) %}<div class="field-error">{{ errores[campo] }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% if tramite.ayuda %}<p class="field-help">{{ tramite.ayuda }}</p>{% endif %}
+  {% endif %}
+
+  <div class="divider">Documentos a Adjuntar</div>
+  <div class="field field-full">
+    <label class="field-label" for="f_anexo">Anexos (documentos adjuntos)</label>
+    <input type="text" id="f_anexo" name="anexo" value="{{ datos.get('anexo', tramite.anexo_sugerido) }}" placeholder="Copia de DNI, recibo de pago">
+    <div class="field-help">Documenta lo que adjuntarás al trámite.</div>
+  </div>
+
+  <div class="actions between">
+    <label style="font-size:12.5px; color:var(--t-suave); display:flex; align-items:center; gap:6px;">
+      <input type="checkbox" name="guardar_perfil" value="1" style="width:auto;"> Guardar estos datos como mi perfil
+    </label>
+    <button type="submit" class="btn btn-primary btn-lg">Continuar →</button>
+  </div>
+</form>
+
+<script>
+function consultarAPI(){
+  const codigo = document.getElementById('api-codigo').value.trim();
+  const status = document.getElementById('api-status');
+  if(!codigo){ status.innerHTML = '<span style="color:var(--naranja)">Ingresa un código.</span>'; return; }
+  status.innerHTML = '<span style="color:var(--t-suave)">⏳ Consultando...</span>';
+  fetch(`{{ url_for('autocompletar_api', clave=clave) }}?codigo=${encodeURIComponent(codigo)}`)
+    .then(r => r.json())
+    .then(data => {
+      if(!data.ok){ status.innerHTML = `<span style="color:var(--rojo)">${data.error}</span>`; return; }
+      const d = data.datos;
+      const setVal = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+      setVal('f_nombres_apellidos', d.nombres_apellidos);
+      setVal('f_dni', d.dni);
+      setVal('f_facultad', d.facultad);
+      setVal('f_escuela', d.escuela);
+      setVal('f_domicilio', d.domicilio);
+      setVal('f_codigo', codigo);
+      status.innerHTML = '<span style="color:var(--verde)">✓ Datos completados. Verifica tu correo institucional manualmente.</span>';
+    })
+    .catch(() => { status.innerHTML = '<span style="color:var(--rojo)">Error al conectar con la API.</span>'; });
+}
+</script>
+{% endblock %}

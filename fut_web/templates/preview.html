@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Vista previa — {{ tramite.nombre }}{% endblock %}
+{% block content %}
+<div class="top-badges">
+  <span class="pill">✓ Datos personales</span>
+  <span class="pill">✓ Fundamentación</span>
+  <span class="pill" style="background:var(--azul); color:#fff; border-color:var(--azul);">3. Vista previa</span>
+  <span class="pill">4. Resultado</span>
+</div>
+<h1 class="page-title">Vista previa del FUT</h1>
+<p class="page-sub">Revisa que todo esté correcto antes de generar el documento.</p>
+
+{% if error_generacion %}
+<div class="alert alert-red">✗ Error al generar el documento: {{ error_generacion }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="divider">Resumen</div>
+  <table class="summary-table">
+    <tr><td class="k">Trámite</td><td class="v">{{ fut.tramite_nombre }}</td></tr>
+    <tr><td class="k">Solicito</td><td class="v">{{ fut.solicito }}</td></tr>
+    <tr><td class="k">Apellidos y Nombres</td><td class="v">{{ fut.nombres_apellidos }}</td></tr>
+    <tr><td class="k">D.N.I.</td><td class="v">{{ fut.dni }}</td></tr>
+    <tr><td class="k">Código</td><td class="v">{{ fut.codigo }}</td></tr>
+    <tr><td class="k">Facultad</td><td class="v">{{ fut.facultad }}</td></tr>
+    <tr><td class="k">Escuela Profesional</td><td class="v">{{ fut.escuela }}</td></tr>
+    <tr><td class="k">Domicilio</td><td class="v">{{ fut.domicilio }}</td></tr>
+    <tr><td class="k">Anexo</td><td class="v">{{ fut.anexo }}</td></tr>
+    <tr><td class="k">Fecha</td><td class="v">{{ fut.fecha }}</td></tr>
+  </table>
+
+  <div class="divider">Fundamentación del pedido</div>
+  <div class="fund-preview">{{ fut.fundamentacion }}</div>
+
+  <form method="post" action="{{ url_for('generar', clave=clave) }}" id="form-generar">
+    <div class="divider">Formato de salida</div>
+    <div class="format-choice">
+      <label><input type="radio" name="formato" value="docx" checked> 📄 Word (.docx)</label>
+      <label><input type="radio" name="formato" value="pdf"> 📕 PDF</label>
+      <label><input type="radio" name="formato" value="ambos"> 🗂️ Ambos (.zip)</label>
+    </div>
+    <p class="field-help">El PDF requiere LibreOffice en el servidor; si no está disponible ahí, se entregará solo el Word.</p>
+    <div id="gen-status" style="display:none;" class="alert alert-green">✓ Tu descarga debería comenzar en unos segundos. Revisa la carpeta de descargas de tu navegador.</div>
+
+    <div class="actions between">
+      <a href="{{ url_for('fundamentacion', clave=clave) }}" class="btn btn-secondary">← Atrás</a>
+      <button type="submit" class="btn btn-gold btn-lg" id="btn-generar">💾 Generar documento</button>
+    </div>
+  </form>
+</div>
+<script>
+document.getElementById('form-generar').addEventListener('submit', function(){
+  const btn = document.getElementById('btn-generar');
+  btn.textContent = '⏳ Generando...'; btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('gen-status').style.display = 'block';
+    btn.textContent = '💾 Generar documento'; btn.disabled = false;
+  }, 1500);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ tramite.nombre }} — FUT-UNDAC{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ url_for('index') }}">&larr; Elegir otro trámite</a>
+  <h1>{{ tramite.nombre }}</h1>
+  {% if tramite.ayuda %}<p class="lead">{{ tramite.ayuda }}</p>{% endif %}
+
+  {% if errores %}
+    <div class="alert alert-error">
+      <strong>Revisa lo siguiente:</strong>
+      <ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('generar') }}" id="fut-form">
+    <input type="hidden" name="tramite_clave" value="{{ clave }}">
+
+    <fieldset>
+      <legend>Datos personales</legend>
+      <div class="form-grid">
+        {% for c in campos_base %}
+          {% if c.clave != 'fundamentacion' %}
+            <div class="field">
+              <label for="{{ c.clave }}">{{ c.etiqueta }}{% if c.obligatorio %} *{% endif %}</label>
+              {% if c.clave == 'domicilio' %}
+                <textarea id="{{ c.clave }}" name="{{ c.clave }}" rows="2" placeholder="{{ c.placeholder }}">{{ valores.get(c.clave, '') }}</textarea>
+              {% else %}
+                <input type="text" id="{{ c.clave }}" name="{{ c.clave }}"
+                       placeholder="{{ c.placeholder }}"
+                       value="{{ valores.get(c.clave, '') }}">
+              {% endif %}
+              {% if c.ayuda %}<small>{{ c.ayuda }}</small>{% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <button type="button" id="btn-autocompletar" class="btn-secondary">Autocompletar con mi código</button>
+      <small id="autocompletar-msg"></small>
+    </fieldset>
+
+    {% if campos_extra %}
+    <fieldset>
+      <legend>Datos del trámite</legend>
+      <div class="form-grid">
+        {% for c in campos_extra %}
+          <div class="field">
+            <label for="{{ c.clave }}">{{ c.etiqueta }}</label>
+            <input type="text" id="{{ c.clave }}" name="{{ c.clave }}" value="{{ valores.get(c.clave, '') }}">
+          </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% endif %}
+
+    <fieldset>
+      <legend>Fundamentación del pedido</legend>
+      <p class="hint">Explica brevemente tu situación en tus propias palabras (opcional si usas la IA) o escribe directamente la fundamentación final.</p>
+      {% if ia_disponible %}
+        <div class="field">
+          <label for="descripcion_libre">Cuéntanos tu situación (para que la IA redacte por ti)</label>
+          <textarea id="descripcion_libre" rows="2" placeholder="Ej: necesito la constancia para un trámite bancario"></textarea>
+        </div>
+        <button type="button" id="btn-ia" class="btn-secondary">Redactar con IA</button>
+        <small id="ia-msg"></small>
+      {% endif %}
+      <div class="field">
+        <label for="fundamentacion">Fundamentación *</label>
+        <textarea id="fundamentacion" name="fundamentacion" rows="6">{{ valores.get('fundamentacion', '') }}</textarea>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn-primary">Generar FUT (Word)</button>
+  </form>
+
+  <script>
+    const TRAMITE_CLAVE = {{ clave|tojson }};
+    const IA_DISPONIBLE = {{ ia_disponible|tojson }};
+
+    document.getElementById("btn-autocompletar").addEventListener("click", async () => {
+      const codigo = document.getElementById("codigo").value.trim();
+      const msg = document.getElementById("autocompletar-msg");
+      if (!codigo) { msg.textContent = "Ingresa tu código de matrícula primero."; return; }
+      msg.textContent = "Buscando...";
+      try {
+        const res = await fetch(`/api/autocompletar/${encodeURIComponent(codigo)}`);
+        const data = await res.json();
+        if (!data.ok) { msg.textContent = data.error || "No se encontraron datos."; return; }
+        for (const [clave, valor] of Object.entries(data.datos || {})) {
+          const el = document.getElementById(clave);
+          if (el && valor && !el.value) el.value = valor;
+        }
+        msg.textContent = "Datos completados. Verifica que sean correctos.";
+      } catch (e) {
+        msg.textContent = "No se pudo conectar con la API de la universidad.";
+      }
+    });
+
+    if (IA_DISPONIBLE) {
+      document.getElementById("btn-ia").addEventListener("click", async () => {
+        const msg = document.getElementById("ia-msg");
+        msg.textContent = "Redactando...";
+        const datos = {
+          tramite_clave: TRAMITE_CLAVE,
+          descripcion_libre: document.getElementById("descripcion_libre").value,
+        };
+        document.querySelectorAll("#fut-form input, #fut-form textarea").forEach(el => {
+          if (el.name) datos[el.name] = el.value;
+        });
+        try {
+          const res = await fetch("/api/fundamentacion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          const data = await res.json();
+          if (!data.ok) { msg.textContent = data.error || "No se pudo redactar."; return; }
+          document.getElementById("fundamentacion").value = data.texto;
+          msg.textContent = "Listo. Puedes editar el texto antes de generar.";
+        } catch (e) {
+          msg.textContent = "No se pudo conectar con el servicio de IA.";
+        }
+      });
+    }
+  </script>
+{% endblock %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}FUT-UNDAC{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">
+      <img src="{{ url_for('static', filename='undac_logo.jpg') }}" alt="UNDAC" class="brand-logo">
+      <span>FUT&#8209;UNDAC</span>
+    </a>
+    <span class="brand-sub">Asistente de Formulario Único de Trámite</span>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>Universidad Nacional Daniel Alcides Carrión &mdash; Herramienta no oficial para agilizar el llenado del FUT.</p>
+  </footer>
+</body>
+</html>

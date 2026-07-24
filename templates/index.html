@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}FUT-UNDAC — Elegir trámite{% endblock %}
+{% block content %}
+  <h1>¿Qué trámite necesitas?</h1>
+  <p class="lead">Elige un trámite y completa tus datos. Al final descargarás tu FUT listo en Word.</p>
+
+  <div class="grid">
+    {% for clave, nombre in tramites %}
+      <a class="card" href="{{ url_for('formulario', clave=clave) }}">
+        <span class="card-title">{{ nombre }}</span>
+        <span class="card-arrow">&rarr;</span>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}
